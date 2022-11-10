@@ -15,17 +15,32 @@ namespace P3D.Game
                 return;
             }
 
-            if (movingObject.FromTransform == null || movingObject.ToTransform == null)
+            if (IsNotValid(movingObject))
             {
                 return;
             }
 
             Gizmos.color = Color.red;
-            Gizmos.DrawSphere(movingObject.FromTransform.position, 0.4f);
-            Gizmos.DrawSphere(movingObject.ToTransform.position, 0.4f);
+            foreach (Transform point in movingObject.Points)
+            {
+                Gizmos.DrawSphere(point.position, 0.4f);
+            }
 
             Gizmos.color = Color.yellow;
-            Gizmos.DrawLine(movingObject.FromTransform.position, movingObject.ToTransform.position);
+            Transform previousPoint = movingObject.Points.First();
+            for (int i = 1; i < movingObject.Points.Count; i++)
+            {
+                Transform point = movingObject.Points[i];
+                Gizmos.DrawLine(previousPoint.position, point.position);
+                previousPoint = point;
+            }
+
+            Gizmos.DrawLine(previousPoint.position, movingObject.Points.First().position);
+        }
+
+        private static bool IsNotValid(MovingObject movingObject)
+        {
+            return movingObject.Points == null || movingObject.Points.Count < 2;
         }
 
         private static bool ShouldDraw(MovingObject movingObject, GizmoType gizmoType)
