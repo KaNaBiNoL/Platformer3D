@@ -1,24 +1,25 @@
+using System;
+using Cinemachine;
 using UnityEngine;
 
 namespace P3D.Game
 {
     public class PlayerRotator : MonoBehaviour
     {
-        [SerializeField] private float _speed;
-        private Vector3 _previousMousePosition;
+        [SerializeField] private CinemachineFreeLook _freeLook;
+        [SerializeField] private PlayerMovement _playerMovement;
 
-        private void Start()
+        private void Awake()
         {
-            _previousMousePosition = Input.mousePosition;
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void Update()
         {
-            Vector3 mousePosition = Input.mousePosition;
-            Vector3 delta = mousePosition - _previousMousePosition;
-            float rotationDelta = delta.x;
-            transform.Rotate(transform.up, rotationDelta * _speed * Time.deltaTime);
-            _previousMousePosition = mousePosition;
+            if (_playerMovement.Velocity.sqrMagnitude > 0)
+            {
+                transform.rotation = Quaternion.Euler(0, _freeLook.m_XAxis.Value, 0);
+            }
         }
     }
 }

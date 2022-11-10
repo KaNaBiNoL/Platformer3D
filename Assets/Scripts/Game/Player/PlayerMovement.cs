@@ -19,6 +19,8 @@ namespace P3D.Game
         [SerializeField] private float _jumpHeight = 2f;
     
         private Vector3 _fallVector;
+        
+        public Vector3 Velocity { get; private set; }
     
     
         private void Update()
@@ -46,6 +48,8 @@ namespace P3D.Game
             _fallVector.y += gravity * Time.deltaTime;
 
             _controller.Move(_fallVector * Time.deltaTime);
+            
+            Velocity = moveVector;
         }
     }
 }
