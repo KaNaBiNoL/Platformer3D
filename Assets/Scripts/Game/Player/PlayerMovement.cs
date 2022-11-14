@@ -5,6 +5,8 @@ namespace P3D.Game
     public class PlayerMovement : MonoBehaviour
     {
         [Header("Base Settings")]
+        [SerializeField] private PlayerAnimation _playerAnimation;
+        
         [SerializeField] private CharacterController _controller;
         [SerializeField] private float _speed = 10f;
         [SerializeField] private float  _gravityMultiplier = 1;
@@ -19,29 +21,30 @@ namespace P3D.Game
         [SerializeField] private float _jumpHeight = 2f;
     
         private Vector3 _fallVector;
-        
+
         public Vector3 Velocity { get; private set; }
-    
-    
+        public bool IsGrounded { get; private set; }
+
         private void Update()
         {
             float vertical = Input.GetAxis("Vertical");
             float horizontal = Input.GetAxis("Horizontal");
 
             Vector3 moveVector = transform.right * horizontal + transform.forward * vertical;
-            moveVector *= _speed * Time.deltaTime;
+            moveVector *= _speed;
 
-            _controller.Move(moveVector);
+            _controller.Move(moveVector * Time.deltaTime);
+            _playerAnimation.SetSpeedHorizontal(moveVector.magnitude);
 
-            bool isGrounded = Physics.CheckSphere(_checkGroundTransform.position, _checkGroundRadius, _checkGroundLayer);
+            IsGrounded = Physics.CheckSphere(_checkGroundTransform.position, _checkGroundRadius, _checkGroundLayer);
 
-            if (isGrounded && _fallVector.y < 0)
+            if (IsGrounded && _fallVector.y < 0)
             {
                 _fallVector.y = 0;
             }
             float gravity = Physics.gravity.y * _gravityMultiplier;
 
-            if (isGrounded && Input.GetButtonDown("Jump"))
+            if (IsGrounded && Input.GetButtonDown("Jump"))
             {
                 _fallVector.y = Mathf.Sqrt(_jumpHeight * -2f * gravity);
             }
@@ -50,6 +53,9 @@ namespace P3D.Game
             _controller.Move(_fallVector * Time.deltaTime);
             
             Velocity = moveVector;
+            
+            _playerAnimation.SetIsGrounded(IsGrounded);
+            _playerAnimation.SetSpeedVertical(_fallVector.y);
         }
     }
 }
